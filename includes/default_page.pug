@@ -1,0 +1,35 @@
+mixin head(title)
+    title= title
+    meta(name='viewport' content='width=device-width, initial-scale=1')
+    link(href='css/bootstrap.min.css' rel='stylesheet')
+    link(href='css/font-awesome.min.css' rel='stylesheet')
+    link(href='css/style.css' rel='stylesheet')
+    script(src='/js/jq.js')
+    script(src='https://unpkg.com/vue@2.4.1')
+
+mixin header(title)
+    .jumbotron.text-center
+        h1= title
+    +icons
+
+mixin navvy(index)
+    -
+        var pages = [ 'Home', 'Users', 'Tiles', 'About'];
+        var urls = [ '/', '/list', '/game', '/about' ];
+    nav(class='navbar navbar-default')
+        ul(class='nav nav-pills')
+            each i in [0, 1, 2, 3]
+                li(class={active: index == i}): a(href=urls[i])= pages[i]
+            if(loggedIn)
+                li(class='pull-right'): a(href='/logout') Logout
+
+mixin icons
+    a(href= 'https://github.com/ahdelgado')
+        i.fa-3x.fa.fa-github.gitcon
+    a(href='https://www.linkedin.com/in/ruizaj')
+        i.fa-3x.fa.fa-linkedin.linkcon
+mixin row(size, offset)
+    .row
+        div(class='col-md-' + size class=offset==0? '' : 'col-md-offset-' + offset)
+            if block
+                block

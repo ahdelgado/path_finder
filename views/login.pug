@@ -1,0 +1,43 @@
+doctype html
+html
+    head
+        include ../includes/default_page.pug
+        script(src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js")
+        +head('Login')
+    body(style='background-color: gray')
+        script.
+            particlesJS.load('particles', 'media/particles.json', function() {
+                console.log('callback - particles.js config loaded');
+            });
+            function check() {
+                var user = $("#username").val();
+                var pass = $("#password").val();
+                if (user == '' || pass == '') {
+                    alert("Username or password invalid");
+                    return false;
+                }
+                return true;
+            }
+        form(action='/new' method='POST' id='signup')
+        form(action='/login' method='POST' id='login')
+        div(id='particles')
+        .container
+            +header('Login')
+            +navvy(0)
+            .panel.panel-default.login-panel
+                .panel-body
+                    br
+                    +row(6, 3)
+                        input.form-control(type='text' name='username' id='username' placeholder='Username' form='login')
+                        br
+                    +row(6, 3)
+                        input.form-control(type='password' name='password' id='password' placeholder='Password' form='login')
+                        br
+                    .row
+                        .col-md-4(class='col-md-offset-2')
+                            input.form-control(type='submit' onclick='return check();'  class='btn btn-primary' value='Login' form='login')
+                        .col-md-4
+                            a.form-control(class='btn btn-primary' href='/signup') Register
+                    br
+    
+    

@@ -1,0 +1,28 @@
+{
+  "name": "web",
+  "version": "1.0.0",
+  "description": "",
+  "main": "database.js",
+  "dependencies": {
+    "bcrypt": "^1.0.2",
+    "bcrypt-nodejs": "0.0.3",
+    "connect-pg-simple": "^4.2.0",
+    "express": "^4.15.3",
+    "express-session": "^1.15.3",
+    "morgan": "^1.8.2",
+    "nodemon": "^1.11.0",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
+    "pg": "^6.2.3",
+    "pug": "^2.0.0-rc.2",
+    "sharp": "^0.18.2"
+  },
+  "devDependencies": {
+    "body-parser": "^1.17.2"
+  },
+  "scripts": {
+    "start": "node database.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
