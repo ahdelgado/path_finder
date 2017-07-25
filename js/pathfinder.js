@@ -25,14 +25,19 @@ class Pathfinder {
       if (tile.x < 0 || tile.y < 0)
         return;
       for(let i = 0; i < list.length; i++) {
-        if(list[i].x == tile.x && list[i].y == tile.y) {
-          console.log('removing ' + tile.pos());
+        if(list[i].x == tile.x && list[i].y == tile.y)
           return list.splice(i, 1);
-        }
       }
     }
 
-    reset(all = true) {
+    findPath() {
+      let i = 0;
+      while (!this.addToOpen() && i <= 300) {
+        i++;
+      }
+    }
+
+    reset(all = true, walls = false) {
       this.opened = [];
       this.closed = [];
       this.path = [];
@@ -41,8 +46,8 @@ class Pathfinder {
       this.board.updated.push(this.current);
       this.board.updated.push(this.end);
       if (all)
-        this.board.reset();
-      this.start.type = 1;
+        this.board.reset(walls);
+      this.start.type = 5;
       this.end.type = 3;
       this.board.update();
     }
@@ -106,17 +111,15 @@ class Pathfinder {
                 this.opened.push(tile);
                 this.board.updated.push(tile);
                 tile.type = 2;
-              } else {
-                if (tile.g < this.current.g) {
+              } else if (tile.g < this.current.g)
                   tile.parent = this.current;
-                }
-              }
             }
           }
         }
       }
       this.updateValues();
       this.board.update();
+      return false;
     }
 
 }

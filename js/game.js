@@ -31,6 +31,9 @@ $(document).ready(() => {
             case 4:
                 ctx.fillStyle='green';
                 break;
+            case 5:
+                ctx.fillStyle='yellow';
+                break;
             default:
                 ctx.fillStyle='gray';
                 break;
@@ -45,7 +48,7 @@ $(document).ready(() => {
           ctx.stroke();
         }
     });
-    pf = new Pathfinder(board, [1,1], [24,19]);
+    pf = new Pathfinder(board, [0,0], [24,19]);
     $canvas.click( (event) => {
         board.setType(translatePos(event));
         board.draw(board.getTile(translatePos(event)));
