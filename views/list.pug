@@ -4,10 +4,12 @@ html
         include ../includes/default_page.pug
         +head('Users')
     body(style='background-color: gray')
+        +particles
+        div(id='particles')
         .container
             +header('Users')
             +navvy(1)
             +row(8, 2)
                 each user, index in users
                     a.form-control(href='/user?id=' + user.id  class='btn btn-link' style='background-color:#f8f8f8;')= user.name
-
+        +footer

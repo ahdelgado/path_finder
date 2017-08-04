@@ -20,18 +20,18 @@ module.exports = function(passport) {
 
     passport.use('signup', new LocalStrategy( { passReqToCallback: true }, (req, username, password, done) => {
         User.findOne(username, false, (err, user) => {
-            if(err) {
-                console.log('error');
+            if(err)
                 return done(err);
-            }
-            if(user){
+            if(user) {
+                req.res.flash('taken', 'Username already taken');
                 return done(null, false);
-            }
+              }
             var newUser = new User();
             newUser.localUsername = username;
             newUser.generateHash(password);
             newUser.save(() => {
                 console.log('user created');
+                return done(null, newUser);
             });
         });
     }));
@@ -39,11 +39,11 @@ module.exports = function(passport) {
         User.findOne(username, false, (err, user) => {
             if(err)
                 return done(err);
-            if(!user)
-                return done(null, false);
-            if(!user.validPassword(password)) {
+            if(!user || !user.validPassword(password)) {
+                req.res.flash('incorrect', 'Invalid username or password');
                 return done(null, false);
             }
+
             return done(null, user);
         });
 

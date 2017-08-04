@@ -2,6 +2,7 @@
 
 var express = require('express');
 var session = require('express-session');
+var flash = require('express-flash-2');
 var sharp = require('sharp');
 var bp = require('body-parser');
 var passport = require('passport');
@@ -9,8 +10,9 @@ var morgan = require('morgan');
 var db = require('./scripts/database.js');
 var User = require('./models/user.js');
 var fb = require('./scripts/facebook.js');
-var app = express();
 var pgSession = require('connect-pg-simple')(session);
+var app = express();
+
 
 require('./scripts/passport.js')(passport);
 
@@ -30,12 +32,14 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(flash());
 app.set('view engine', 'pug');
 app.set('views', './views');
 app.locals.pretty = true;
 
 var dev = true;
 var users = [];
+var port = 80
 
 function dlog(mesg) {
     if (dev)
@@ -59,12 +63,21 @@ function isLoggedOn(req, res, next) {
     if(req.isAuthenticated()) {
         return next();
     }
+    res.flash('notLogged', 'Please sign in')
     res.redirect('/');
 }
 
+function validateInfo(req, res, next) {
+  if (req.body.username === '' || req.body.password === '') {
+    req.res.flash('incorrect', 'Invalid username or password');
+    res.redirect('/');
+  }
+  return next();
+}
 
-app.listen(80, () => {
-    console.log('listening on 80');
+
+app.listen(port, () => {
+    console.log('listening on ' + port);
 });
 
 app.get('/auth/facebook', passport.authenticate('facebook'));
@@ -85,23 +98,29 @@ app.get('/', (req, res) => {
       res.render('user', user);
     });
   } else {
-    res.render('login');
+    res.render('login', { dev: req.connection.remoteAddress === '::1'? true : false});
   }
 });
 
 app.get('/pp', (req, res) => {
-  res.send('Work in progress');
+  res.render('pp');
 });
 
 app.get('/signup', (req, res) => {
    res.render('signup');
 });
 
-app.post('/login', passport.authenticate('login', { session: true, successRedirect : '/', failureRedirect : '/' }), (req, res) => {
-  res.redirect('/');
-});
+app.post('/login', validateInfo, passport.authenticate('login', { session: true, successRedirect : '/', failureRedirect : '/' }));
 
-app.post('/new', passport.authenticate('signup', { session: true, successRedirect:  '/list', failureRedirect: '/signup' }));
+app.post('/new', passport.authenticate('signup', { session: true, failureRedirect: '/signup' }), (req, res) => {
+  User.findOne(req.user.localUsername, false, (err, user) => {
+    req.login(user, function(err) {
+      if (err)
+        console.log(err);
+      res.redirect('/');
+    });
+  });
+});
 
 app.get('/logout', (req, res) => {
    req.logout();
@@ -120,10 +139,7 @@ app.get('/user', isLoggedOn, (req, res) => {
     User.findOne(req.query.id, true, (err, user) => {
       if(err)
         return console.log(err);
-      if(req.query.id == req.user.localId)
-        user.owner = true;
-      user.loggedIn = req.isAuthenticated();
-      res.render('user', user);
+      res.render('user', user.pageify(req));
     });
 });
 
@@ -143,6 +159,10 @@ app.get('/delete/:id', (req, res) => {
     db.deleteUser(req.params.id, ()=> {
         res.redirect('/list');
     });
+});
+
+app.get('/article', (req, res) => {
+  res.render('article');
 });
 
 app.get('/iframe', (req, res) => {
